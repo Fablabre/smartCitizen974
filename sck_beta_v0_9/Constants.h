@@ -35,17 +35,17 @@ WIFI AND SERVER STATICS - WiFly, Http server parameters.
 WIFLY Firmware Setting
 
 */
-
-#define networks 0
+// FT : set AP parameters to direct upload on SCK 
+#define networks 1
 #if (networks > 0)
 static char* mySSID[networks]      = { 
-  "SSID1"        , "SSID2"        , "SSID3"             };
+  "<AP NAME>"             };
 static char* myPassword[networks]  = { 
-  "PASS1"      , "PASS2"       , "PASS3"            };
+  "<WEP/WPA key>"         };
 static char* wifiEncript[networks] = { 
-  WPA2         , WPA2          , WPA2               };
+  WPA2                    }; // set the WiFky Auth Modes 
 static char* antennaExt[networks]  = { 
-  INT_ANT      , INT_ANT       , INT_ANT            };
+  INT_ANT                 };
 #endif      
 
 #define TWI_FREQ 400000L //Frecuencia bus I2C
@@ -212,8 +212,10 @@ BATTERY PARAMETERS - Battery sensing calibration parameters
 #define buffer_length        32
 static char buffer[buffer_length];
 
-// Basic Server Posts to the SmartCitizen Platform - EndPoint: http://data.smartcitizen.me/add 
-static char* WEB[8]={
+// engee974 : add PixelHumain Server  
+static char* WEB[2][8]={
+  // Basic Server Posts to the SmartCitizen Platform - EndPoint: http://data.smartcitizen.me/add
+                  {
                   "data.smartcitizen.me",
                   "PUT /add HTTP/1.1\n", 
                   "Host: data.smartcitizen.me \n", 
@@ -221,7 +223,18 @@ static char* WEB[8]={
                   "X-SmartCitizenMacADDR: ", 
                   "X-SmartCitizenApiKey: ", 
                   "X-SmartCitizenVersion: ",  
-                  "X-SmartCitizenData: "};
+                  "X-SmartCitizenData: "},
+   // Pixelhumain's Server to push Opendata
+                  {            
+                  "test.pixelhumain.com",
+                  "PUT /ph/opendata/default/push HTTP/1.1 \n", 
+                  "Host: test.pixelhumain.com \n", 
+                  "User-Agent: FTBoard/1.0\n", 
+                  "X-BoardId: ", 
+                  "X-ApiKey: ", 
+                  "X-BoardVersion: ",  
+                  "data: "}
+};
   
 // Time server request -  EndPoint: http://data.smartcitizen.me/datetime                 
 static char* WEBTIME[3]={                  

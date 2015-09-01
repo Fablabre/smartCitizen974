@@ -29,7 +29,7 @@ boolean SCKServer::time(char *time_) {
    retry++;
    if (base__.enterCommandMode()) 
     {
-      if (base__.open(WEB[0], 80))
+      if (base__.open(WEB[0][0], 80)) // engee974 : test connection with smartcitizen servers
        {
         for(byte i = 0; i<3; i++) Serial1.print(WEBTIME[i]); //Requests to the server time
         if (base__.findInResponse("UTC:", 2000)) 
@@ -202,22 +202,29 @@ boolean SCKServer::update(long *value, char *time_)
 
 boolean SCKServer::connect()
 {
-  int retry = 0;
-  while (true){
-    if (base__.open(WEB[0], 80)) break;
-    else 
+  // engee974 : add a loop to connect to all WEB declared
+  int retry;
+  for (byte i = 0; i<2; i++)
     {
-      retry++;
-      if (retry >= numbers_retry) return false;
+      retry = 0;
+      char** theWEB = &WEB[i][0];
+ 
+      while (true){
+        if (base__.open(theWEB[0], 80)) break;
+        else 
+        {
+          retry++;
+          if (retry >= numbers_retry) return false;
+        }
+      }    
+      for (byte j = 1; j<5; j++) Serial1.print(theWEB[j]);
+      Serial1.println(base__.readData(EE_ADDR_MAC, 0, INTERNAL)); //MAC ADDRESS
+      Serial1.print(theWEB[5]);
+      Serial1.println(base__.readData(EE_ADDR_APIKEY, 0, INTERNAL)); //Apikey
+      Serial1.print(theWEB[6]);
+      Serial1.println(FirmWare); //Firmware version*/
+      Serial1.print(theWEB[7]);
     }
-  }    
-  for (byte i = 1; i<5; i++) Serial1.print(WEB[i]);
-  Serial1.println(base__.readData(EE_ADDR_MAC, 0, INTERNAL)); //MAC ADDRESS
-  Serial1.print(WEB[5]);
-  Serial1.println(base__.readData(EE_ADDR_APIKEY, 0, INTERNAL)); //Apikey
-  Serial1.print(WEB[6]);
-  Serial1.println(FirmWare); //Firmware version
-  Serial1.print(WEB[7]);
   return true; 
 }
 
