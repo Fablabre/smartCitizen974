@@ -29,7 +29,7 @@ boolean SCKServer::time(char *time_) {
    retry++;
    if (base__.enterCommandMode()) 
     {
-      if (base__.open(WEB[0], 80))
+      if (base__.open(WEB[0][0], 80))
        {
         for(byte i = 0; i<3; i++) Serial1.print(WEBTIME[i]); //Requests to the server time
         if (base__.findInResponse("UTC:", 2000)) 
@@ -200,24 +200,24 @@ boolean SCKServer::update(long *value, char *time_)
   return true; 
 }
 
-boolean SCKServer::connect()
+boolean SCKServer::connect(char *theWEB[8])
 {
   int retry = 0;
   while (true){
-    if (base__.open(WEB[0], 80)) break;
+    if (base__.open(theWEB[0], 80)) break;
     else 
     {
       retry++;
       if (retry >= numbers_retry) return false;
     }
   }    
-  for (byte i = 1; i<5; i++) Serial1.print(WEB[i]);
+  for (byte i = 1; i<5; i++) Serial1.print(theWEB[i]);
   Serial1.println(base__.readData(EE_ADDR_MAC, 0, INTERNAL)); //MAC ADDRESS
-  Serial1.print(WEB[5]);
+  Serial1.print(theWEB[5]);
   Serial1.println(base__.readData(EE_ADDR_APIKEY, 0, INTERNAL)); //Apikey
-  Serial1.print(WEB[6]);
+  Serial1.print(theWEB[6]);
   Serial1.println(FirmWare); //Firmware version
-  Serial1.print(WEB[7]);
+  Serial1.print(theWEB[7]);
   return true; 
 }
 
@@ -242,29 +242,34 @@ void SCKServer::send(boolean sleep, boolean *wait_moment, long *value, char *tim
           #endif   
           if (update(value, time)) //Update time and nets
           {
-            #if debugEnabled
-                if (!ambient__.debug_state())
+            int num_post;
+            int cycles;
+            for(byte j = 0; j < 2 ; j++)
+            {
+              #if debugEnabled
+                  if (!ambient__.debug_state())
+                  {
+                    Serial.print(F("updates = "));
+                    Serial.println(updates + 1);
+                  }
+              #endif
+              num_post = updates;
+              cycles = cycles = updates/POST_MAX;;
+              if (updates > POST_MAX) 
                 {
-                  Serial.print(F("updates = "));
-                  Serial.println(updates + 1);
+                  for (int i=0; i<cycles; i++)
+                  {
+                    connect(WEB[j]);
+                    json_update(POST_MAX, value, time, false);
+                  }
+                  num_post = updates - cycles*POST_MAX;
                 }
-            #endif
-            int num_post = updates;
-            int cycles = cycles = updates/POST_MAX;;
-            if (updates > POST_MAX) 
-              {
-                for (int i=0; i<cycles; i++)
-                {
-                  connect();
-                  json_update(POST_MAX, value, time, false);
-                }
-                num_post = updates - cycles*POST_MAX;
-              }
-            connect();
-            json_update(num_post, value, time, true);
-            #if debugEnabled
-                  if (!ambient__.debug_state()) Serial.println(F("Posted to Server!")); 
-            #endif
+              connect(WEB[j]);
+              json_update(num_post, value, time, true);
+              #if debugEnabled
+                    if (!ambient__.debug_state()) Serial.println(F("Posted to Server!")); 
+              #endif
+            }
             
           }
           else 

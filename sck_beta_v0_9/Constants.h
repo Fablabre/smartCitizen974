@@ -212,16 +212,29 @@ BATTERY PARAMETERS - Battery sensing calibration parameters
 #define buffer_length        32
 static char buffer[buffer_length];
 
-// Basic Server Posts to the SmartCitizen Platform - EndPoint: http://data.smartcitizen.me/add 
-static char* WEB[8]={
+// 1. Basic Server Posts to the SmartCitizen Platform - EndPoint: http://data.smartcitizen.me/add 
+// 2. Pixelhumain's Server to push Opendata  
+static char* WEB[2][8]={
+  // 1.
+                  {
                   "data.smartcitizen.me",
-                  "PUT /add HTTP/1.1\n", 
+                  "PUT /add HTTP/1.1 \n", 
                   "Host: data.smartcitizen.me \n", 
                   "User-Agent: SmartCitizen \n", 
                   "X-SmartCitizenMacADDR: ", 
                   "X-SmartCitizenApiKey: ", 
                   "X-SmartCitizenVersion: ",  
-                  "X-SmartCitizenData: "};
+                  "X-SmartCitizenData: "},
+  // 2.
+                  {            
+                  "test.pixelhumain.com",
+                  "PUT /ph/opendata/default/push HTTP/1.1 \n", 
+                  "Host: test.pixelhumain.com \n", 
+                  "User-Agent: FTBoard/1.0\n", 
+                  "X-BoardId: ", 
+                  "X-ApiKey: ", 
+                  "X-BoardVersion: ",  
+                  "data: "}};
   
 // Time server request -  EndPoint: http://data.smartcitizen.me/datetime                 
 static char* WEBTIME[3]={                  
