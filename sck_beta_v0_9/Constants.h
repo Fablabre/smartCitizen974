@@ -36,8 +36,15 @@ WIFLY Firmware Setting
 
 */
 
-#define networks 0
+#define networks 1 // 0 to ignore Wifi AP settings, 1 to set Wifi AP settings for compilation 
 #if (networks > 0)
+// only 1 wifi AP example 
+static char* mySSID[networks]      = { "MyWifiSSID"};
+static char* myPassword[networks]  = { "MyPassword"};
+static char* wifiEncript[networks] = { WPA2 };
+static char* antennaExt[networks]  = { INT_ANT };
+/*
+// for several wifi AP example : define properly networks value to match declaration 
 static char* mySSID[networks]      = { 
   "SSID1"        , "SSID2"        , "SSID3"             };
 static char* myPassword[networks]  = { 
@@ -46,6 +53,7 @@ static char* wifiEncript[networks] = {
   WPA2         , WPA2          , WPA2               };
 static char* antennaExt[networks]  = { 
   INT_ANT      , INT_ANT       , INT_ANT            };
+*/
 #endif      
 
 #define TWI_FREQ 400000L //Frecuencia bus I2C
