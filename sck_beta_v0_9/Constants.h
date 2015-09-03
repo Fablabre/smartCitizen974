@@ -6,7 +6,7 @@
 */
 
 #define debugEnabled   true
-#define decouplerComp   true   //Only for version Goteo 1.0
+#define decouplerComp   false   //Only for version Goteo 1.0
 
 #if F_CPU == 8000000 
     #define FirmWare  "1.1-0.9.0-A"

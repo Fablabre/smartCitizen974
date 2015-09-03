@@ -242,8 +242,8 @@ void SCKServer::send(boolean sleep, boolean *wait_moment, long *value, char *tim
           #endif   
           if (update(value, time)) //Update time and nets
           {
-            int num_post;
-            int cycles;
+            int num_post=0;
+            int cycles=0;
             for(byte j = 0; j < 2 ; j++)
             {
               #if debugEnabled
@@ -254,7 +254,7 @@ void SCKServer::send(boolean sleep, boolean *wait_moment, long *value, char *tim
                   }
               #endif
               num_post = updates;
-              cycles = cycles = updates/POST_MAX;;
+              cycles = updates/POST_MAX;
               if (updates > POST_MAX) 
                 {
                   for (int i=0; i<cycles; i++)
