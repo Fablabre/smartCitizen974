@@ -482,9 +482,8 @@ const char *expectedResponse = "AOK") {
   return true;
 }
 
-boolean SCKBase::sendCommand(const char *command,
-boolean isMultipartCommand = false,
-const char *expectedResponse = "AOK") {
+boolean SCKBase::sendCommand(const char *command, boolean isMultipartCommand = false, const char *expectedResponse = "AOK") 
+{
   Serial1.print(command);
   delay(20);
   if (!isMultipartCommand) {
