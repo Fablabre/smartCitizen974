@@ -428,7 +428,7 @@ void SCKAmbient::ini()
       DATA = (DATA|Wire.read()); 
       DATA &= ~0x0003; 
       return DATA;
-  }
+   }
   
    void SCKAmbient::getSHT21()
    {
@@ -787,7 +787,10 @@ void SCKAmbient::execute()
     {
       sleep = false;
       digitalWrite(AWAKE, HIGH);
-      server_.json_update(0, value, time, true);
+      for(byte i = 0; i<WEBS; i++)
+      {
+        server_.json_update(0, value, time, true,i);
+      }
       usb_mode = false;
       terminal_mode = false;
     }
@@ -810,7 +813,7 @@ void SCKAmbient::execute()
 void SCKAmbient::txDebug() {
   if (debugON== false) {
     float dec = 0;
-    for(int i=0; i<9; i++) 
+    for(int i=0; i<SENSORS; i++) 
     {
       #if F_CPU == 8000000 
         if (i<2) dec = 1;
@@ -830,7 +833,7 @@ void SCKAmbient::txDebug() {
       else Serial.print((unsigned int)(value[i]/dec)); 
       Serial.println(UNITS[i]);
     }
-    Serial.print(SENSOR[9]);
+    Serial.print(SENSOR[SENSORS+1]);
     Serial.println(time);
     Serial.println(F("*******************"));    
   } 

@@ -6,7 +6,7 @@
 */
 
 #define debugEnabled   true
-#define decouplerComp   true   //Only for version Goteo 1.0
+#define decouplerComp   false   //Only for version Goteo 1.0
 
 #if F_CPU == 8000000 
     #define FirmWare  "1.1-0.9.0-A"
@@ -36,8 +36,15 @@ WIFLY Firmware Setting
 
 */
 
-#define networks 0
+#define networks 1 // 0 to ignore Wifi AP settings, 1 to set Wifi AP settings for compilation 
 #if (networks > 0)
+// only 1 wifi AP example 
+static char* mySSID[networks]      = { "MyWifiSSID"};
+static char* myPassword[networks]  = { "MyPassword"};
+static char* wifiEncript[networks] = { WPA2 };
+static char* antennaExt[networks]  = { INT_ANT };
+/*
+// for several wifi AP example : define properly networks value to match declaration 
 static char* mySSID[networks]      = { 
   "SSID1"        , "SSID2"        , "SSID3"             };
 static char* myPassword[networks]  = { 
@@ -46,6 +53,7 @@ static char* wifiEncript[networks] = {
   WPA2         , WPA2          , WPA2               };
 static char* antennaExt[networks]  = { 
   INT_ANT      , INT_ANT       , INT_ANT            };
+*/
 #endif      
 
 #define TWI_FREQ 400000L //Frecuencia bus I2C
@@ -130,18 +138,15 @@ Internal EEPROM Memory Addresses
 #define EE_ADDR_TIME_UPDATE                         32  //4BYTES Time between update and update of the sensors in seconds
 #define EE_ADDR_SENSOR_MODE                         36  //4BYTES Type sensors capture
 #define EE_ADDR_NUMBER_UPDATES                      40  //4BYTES Number of updates before posting
-#define EE_ADDR_NUMBER_READ_MEASURE                 44  //4BYTES Number of updates before posting
-#define EE_ADDR_NUMBER_WRITE_MEASURE                48  //4BYTES Number of updates before posting
-#define EE_ADDR_NUMBER_NETS                         52  //4BYTES Number of networks in the memory 
-#define EE_ADDR_APIKEY                              56  //32BYTES Apikey of the device
-#define EE_ADDR_MAC                                 100  //32BYTES MAC of the device
+#define EE_ADDR_NUMBER_NETS                         44  //4BYTES Number of networks in the memory 
+#define EE_ADDR_APIKEY                              48  //32BYTES Apikey of the device
+#define EE_ADDR_MAC                                 80  //32BYTES MAC of the device
 
 // SCK WIFI SETTINGS Parameters
-#define DEFAULT_ADDR_SSID                                150  //160 BYTES
-#define DEFAULT_ADDR_PASS                                310  //160 BYTES
-#define DEFAULT_ADDR_AUTH                                470  //160 BYTES 
-#define DEFAULT_ADDR_ANTENNA                             630  //160 BYTES
-
+#define DEFAULT_ADDR_SSID                           112  //160 BYTES
+#define DEFAULT_ADDR_PASS                           272  //160 BYTES
+#define DEFAULT_ADDR_AUTH                           432  //160 BYTES 
+#define DEFAULT_ADDR_ANTENNA                        592  //160 BYTES
 
 /* 
 
@@ -212,16 +217,35 @@ BATTERY PARAMETERS - Battery sensing calibration parameters
 #define buffer_length        32
 static char buffer[buffer_length];
 
-// Basic Server Posts to the SmartCitizen Platform - EndPoint: http://data.smartcitizen.me/add 
-static char* WEB[8]={
+#define WEBS   2  //Number of Servers to Post data
+
+// MEASURES SAVED FIFO POINTERS ADDRESS 
+#define EE_ADDR_NUMBER_READ_MEASURE           752  //4BYTES Number of updates before posting
+#define EE_ADDR_NUMBER_WRITE_MEASURE          EE_ADDR_NUMBER_READ_MEASURE+(4*WEBS)  //4BYTES Number of updates before posting
+
+// 1. Basic Server Posts to the SmartCitizen Platform - EndPoint: http://data.smartcitizen.me/add 
+// 2. Pixelhumain's Server to push Opendata  
+static char* WEB[2][8]={
+  // 1.
+                  {
                   "data.smartcitizen.me",
-                  "PUT /add HTTP/1.1\n", 
+                  "PUT /add HTTP/1.1 \n", 
                   "Host: data.smartcitizen.me \n", 
                   "User-Agent: SmartCitizen \n", 
                   "X-SmartCitizenMacADDR: ", 
                   "X-SmartCitizenApiKey: ", 
                   "X-SmartCitizenVersion: ",  
-                  "X-SmartCitizenData: "};
+                  "X-SmartCitizenData: "},
+  // 2.
+                  {            
+                  "test.pixelhumain.com",
+                  "PUT /ph/opendata/default/push HTTP/1.1 \n", 
+                  "Host: test.pixelhumain.com \n", 
+                  "User-Agent: FTBoard/1.0\n", 
+                  "X-BoardId: ", 
+                  "X-ApiKey: ", 
+                  "X-BoardVersion: ",  
+                  "data: "}};
   
 // Time server request -  EndPoint: http://data.smartcitizen.me/datetime                 
 static char* WEBTIME[3]={                  
